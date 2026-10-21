@@ -1,0 +1,892 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CTCI Tests</title>
+  <meta name="description" content="JUnit 5 tests and Java stubs to practice the 189 questions of Cracking the Coding Interview (6th edition), with a personal progress tracker." />
+  <meta name="theme-color" content="#ffffff" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%230866FF'/%3E%3Cpath d='M15 16l4-4-4-4M9 8l-4 4 4 4' fill='none' stroke='white' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    /* Tokens no estilo de williamtrindade.com: Inter, azul #0866FF, cantos arredondados, sem bordas. */
+    :root {
+      --text: #1c2b33;
+      --text-muted: #65676b;
+      --text-subtle: #64748b;
+      --blue: #0866ff;
+      --blue-hover: #0055d4;
+      --blue-soft: rgba(8, 102, 255, 0.08);
+      --bg: #ffffff;
+      --bg-soft: #f8f9fa;
+      --bg-muted: #f1f5f9;
+      --line: #e2e8f0;
+      --radius: 16px;
+      --radius-pill: 50px;
+      --transition: 0.2s ease;
+      --cell: 22px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body { min-height: 100vh; min-height: 100dvh; }
+
+    body {
+      font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      color: var(--text);
+      background: var(--bg);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      display: flex;
+      flex-direction: column;
+    }
+
+    a { color: inherit; text-decoration: none; transition: color var(--transition); }
+    button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
+    :focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
+
+    .wrap { width: 100%; max-width: 1240px; margin: 0 auto; padding: 0 16px; }
+
+    /* Header */
+    header { padding: 18px 0; }
+    .header-inner { display: flex; align-items: center; justify-content: space-between; }
+    .brand { font-weight: 700; font-size: 1.15rem; letter-spacing: -0.03em; }
+    .brand span { color: var(--blue); }
+    .gh {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 40px; height: 40px; border-radius: 50%;
+      background: var(--bg-muted); color: var(--text);
+      transition: background var(--transition), color var(--transition);
+    }
+    .gh:hover { background: var(--blue); color: #fff; }
+    .header-actions { display: flex; align-items: center; gap: 12px; }
+    .langs { display: flex; gap: 4px; padding: 4px; border-radius: var(--radius-pill); background: var(--bg-muted); }
+    .lang {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 32px; height: 32px; border-radius: 50%;
+      opacity: 0.45; filter: grayscale(0.6);
+      transition: opacity var(--transition), filter var(--transition), background var(--transition);
+    }
+    .lang:hover { opacity: 1; filter: none; }
+    .lang[aria-pressed="true"] { opacity: 1; filter: none; background: var(--bg); box-shadow: 0 1px 4px rgba(15, 23, 42, 0.12); }
+    .lang svg { width: 22px; height: 22px; border-radius: 50%; display: block; }
+
+    /* Layout principal: tudo cabe na tela, sem rolagem (desktop) */
+    main { flex: 1; display: flex; align-items: center; }
+    .grid {
+      display: grid;
+      grid-template-columns: minmax(0, clamp(280px, 30vw, 400px)) minmax(0, 1fr);
+      gap: clamp(32px, 4vw, 56px);
+      align-items: center;
+    }
+
+    /* Coluna esquerda: capa + objetivo */
+    .about { display: flex; gap: 24px; align-items: flex-start; flex-direction: column; }
+    .cover {
+      width: 150px; height: auto; aspect-ratio: 7 / 10; border-radius: 10px; object-fit: cover;
+      background: var(--bg-muted);
+      box-shadow: 0 1px 0 var(--line), 0 18px 40px rgba(15, 23, 42, 0.14);
+    }
+    .eyebrow {
+      display: inline-block; margin-bottom: 10px;
+      font-size: 0.75rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--blue);
+    }
+    h1 {
+      font-size: clamp(1.7rem, 2.6vw, 2.3rem); font-weight: 800;
+      line-height: 1.15; letter-spacing: -0.03em; margin-bottom: 14px;
+    }
+    h1 em { font-style: normal; color: var(--blue); }
+    .lead { color: var(--text-muted); font-size: 0.98rem; margin-bottom: 20px; }
+    .lead code {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 0.85em; background: var(--bg-muted); padding: 1px 6px; border-radius: 6px;
+    }
+    .actions { display: flex; flex-wrap: wrap; gap: 10px; }
+    .btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 10px 22px; border-radius: var(--radius-pill);
+      font-size: 0.9rem; font-weight: 600;
+      transition: background var(--transition), color var(--transition);
+    }
+    .btn-primary { background: var(--blue); color: #fff; }
+    .btn-primary:hover { background: var(--blue-hover); }
+    .btn-outline { background: var(--bg-muted); color: var(--text); }
+    .btn-outline:hover { background: var(--blue-soft); color: var(--blue); }
+
+    /* Coluna direita: painel de progresso */
+    .panel { background: var(--bg-soft); border-radius: 24px; padding: 22px 26px; }
+    .panel-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 4px 16px; margin-bottom: 10px; }
+    .panel-title { font-size: 1.1rem; font-weight: 700; letter-spacing: -0.02em; }
+    .panel-nums { font-size: 0.9rem; color: var(--text-muted); font-variant-numeric: tabular-nums; }
+    .panel-nums strong { color: var(--text); }
+    .bar { height: 6px; border-radius: 99px; background: var(--line); overflow: hidden; margin-bottom: 14px; }
+    .bar span { display: block; height: 100%; width: 0; background: var(--blue); border-radius: 99px; transition: width 0.3s ease; }
+
+    .chapters { list-style: none; display: flex; flex-direction: column; gap: 4px; }
+    .ch { display: grid; grid-template-columns: var(--name-col, 168px) minmax(0, 1fr) 44px; align-items: center; gap: 12px; }
+    .ch-name { font-size: 0.8rem; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .ch-name b { display: inline-block; width: 22px; color: var(--text); font-weight: 600; font-variant-numeric: tabular-nums; }
+    .ch-count { font-size: 0.75rem; color: var(--text-subtle); text-align: right; font-variant-numeric: tabular-nums; }
+    .ch.complete .ch-count { color: var(--blue); font-weight: 700; }
+    .cells { display: flex; flex-wrap: wrap; gap: 3px; }
+    .cell {
+      width: var(--cell); height: var(--cell); border-radius: 6px;
+      background: var(--bg); box-shadow: inset 0 0 0 1px var(--line);
+      font-size: 0.66rem; font-weight: 600; color: var(--text-subtle);
+      font-variant-numeric: tabular-nums;
+      transition: background var(--transition), color var(--transition), box-shadow var(--transition);
+    }
+    .cell:hover { box-shadow: inset 0 0 0 1px var(--blue); color: var(--blue); }
+    .cell[aria-pressed="true"] { background: var(--blue); color: #fff; box-shadow: none; }
+
+    .panel-foot { display: flex; justify-content: space-between; align-items: center; margin-top: 14px; font-size: 0.78rem; color: var(--text-subtle); }
+    .link-btn { font-size: 0.78rem; font-weight: 600; color: var(--text-muted); }
+    .link-btn:hover { color: #e11d48; }
+    .foot-actions { display: flex; align-items: center; gap: 16px; flex-shrink: 0; }
+    .share-btn { font-size: 0.78rem; font-weight: 600; color: var(--blue); display: inline-flex; align-items: center; gap: 6px; }
+    .share-btn:hover { color: var(--blue-hover); }
+
+    /* Aviso ao marcar uma questão */
+    .toast {
+      position: fixed; left: 50%; bottom: 24px; z-index: 50;
+      transform: translate(-50%, 16px); opacity: 0; pointer-events: none;
+      display: flex; align-items: center; gap: 14px;
+      padding: 10px 10px 10px 18px; border-radius: var(--radius-pill);
+      background: #0f172a; color: #fff; font-size: 0.88rem; font-weight: 500;
+      box-shadow: 0 12px 32px rgba(15, 23, 42, 0.25);
+      transition: opacity var(--transition), transform var(--transition);
+      max-width: calc(100vw - 32px);
+    }
+    .toast.show { opacity: 1; transform: translate(-50%, 0); pointer-events: auto; }
+    .toast-share { background: var(--blue); color: #fff; padding: 7px 16px; border-radius: var(--radius-pill); font-size: 0.82rem; font-weight: 600; white-space: nowrap; }
+    .toast-share:hover { background: var(--blue-hover); }
+    .toast-close { color: #94a3b8; width: 28px; height: 28px; border-radius: 50%; font-size: 1rem; line-height: 1; }
+    .toast-close:hover { color: #fff; }
+
+    /* Janela de compartilhamento */
+    .share-dialog {
+      width: min(680px, calc(100vw - 32px)); max-height: calc(100dvh - 32px);
+      margin: auto; padding: 24px; border: 0; border-radius: 24px;
+      color: var(--text); background: var(--bg);
+      box-shadow: 0 24px 64px rgba(15, 23, 42, 0.25);
+    }
+    .share-dialog::backdrop { background: rgba(15, 23, 42, 0.5); backdrop-filter: blur(4px); }
+    .sd-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+    .sd-title { font-size: 1.15rem; font-weight: 700; letter-spacing: -0.02em; }
+    .sd-close { width: 36px; height: 36px; border-radius: 50%; background: var(--bg-muted); font-size: 1rem; }
+    .sd-close:hover { background: var(--line); }
+    .sd-formats { display: inline-flex; gap: 4px; padding: 4px; margin-bottom: 14px; border-radius: var(--radius-pill); background: var(--bg-muted); }
+    .sd-format {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 7px 16px; border-radius: var(--radius-pill);
+      font-size: 0.84rem; font-weight: 600; color: var(--text-muted);
+      transition: background var(--transition), color var(--transition);
+    }
+    .sd-format:hover { color: var(--text); }
+    .sd-format[aria-pressed="true"] { background: var(--bg); color: var(--blue); box-shadow: 0 1px 4px rgba(15, 23, 42, 0.12); }
+    .sd-preview { display: flex; justify-content: center; border-radius: 14px; background: var(--bg-soft); }
+    .sd-img { display: block; width: 100%; height: auto; aspect-ratio: 1200 / 630; border-radius: 14px; background: var(--bg-muted); box-shadow: 0 0 0 1px var(--line); }
+    .sd-img.story { width: auto; height: min(52vh, 460px); aspect-ratio: 1080 / 1920; margin: 12px 0; border-radius: 12px; }
+    .sd-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+    .sd-actions .btn { padding: 9px 18px; font-size: 0.85rem; }
+    .sd-note { margin-top: 12px; min-height: 1.2em; font-size: 0.8rem; color: var(--text-subtle); }
+    .sd-note.ok { color: #16a34a; font-weight: 600; }
+    .sd-social { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; margin-top: 16px; }
+    .sd-label { font-size: 0.85rem; font-weight: 600; color: var(--text-muted); }
+    .socials { display: flex; flex-wrap: wrap; gap: 8px; }
+    .social {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 44px; height: 44px; border-radius: 50%; color: #fff;
+      transition: transform var(--transition), filter var(--transition);
+    }
+    .social:hover { transform: translateY(-2px); filter: brightness(1.08); }
+    .social-linkedin { background: #0a66c2; }
+    .social-x { background: #000; }
+    .social-whatsapp { background: #25d366; }
+    .social-facebook { background: #1877f2; }
+    .social-telegram { background: #26a5e4; }
+    .social-instagram { background: radial-gradient(circle at 30% 107%, #fdf497 0%, #fd5949 45%, #d6249f 60%, #285aeb 90%); }
+
+    footer { padding: 16px 0 20px; font-size: 0.75rem; color: var(--text-subtle); }
+    footer a { text-decoration: underline; text-underline-offset: 2px; }
+    footer a:hover { color: var(--blue); }
+
+    /* Notebooks com tela baixa: compacta para continuar sem rolagem */
+    @media (min-width: 961px) and (max-height: 780px) {
+      :root { --cell: 20px; }
+      header { padding: 12px 0; }
+      .chapters { gap: 3px; }
+      .panel { padding: 18px 24px; }
+      .bar { margin-bottom: 12px; }
+      .panel-foot { margin-top: 10px; }
+      .cover { width: 130px; }
+      footer { padding: 10px 0 14px; }
+    }
+    /* Larguras intermediárias: coluna do nome mais estreita */
+    @media (min-width: 961px) and (max-width: 1180px) {
+      :root { --name-col: 148px; }
+      .ch-name { font-size: 0.76rem; }
+    }
+
+    /* Tablet: empilha (capa ao lado do texto) e permite rolagem */
+    @media (max-width: 960px) {
+      .grid { grid-template-columns: 1fr; gap: 32px; padding-top: 8px; padding-bottom: 24px; }
+      .about { flex-direction: row; }
+      .cover { width: 120px; flex-shrink: 0; }
+    }
+
+    /* Celular: nome e contagem numa linha, quadradinhos numa grade de 10 colunas */
+    @media (max-width: 640px) {
+      header { padding: 12px 0; }
+      .grid { gap: 24px; }
+      .about { flex-direction: column; gap: 20px; }
+      .cover { width: 104px; }
+      h1 { font-size: 1.75rem; }
+      .actions .btn { flex: 1; justify-content: center; }
+      .panel { padding: 18px 14px; border-radius: 20px; }
+      .chapters { gap: 14px; }
+      .ch { grid-template-columns: minmax(0, 1fr) auto; gap: 6px 8px; }
+      .ch-name { font-size: 0.85rem; }
+      .ch-count { grid-row: 1; grid-column: 2; }
+      .cells { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(10, minmax(0, 1fr)); gap: 4px; }
+      .cell { width: auto; height: auto; aspect-ratio: 1; font-size: 0.72rem; border-radius: 7px; }
+      .panel-foot { gap: 12px; }
+      .sd-actions .btn { flex: 1 1 calc(50% - 4px); justify-content: center; }
+      .sd-social { gap: 10px; }
+      .socials { gap: 6px; }
+      .social { width: 42px; height: 42px; }
+      .share-dialog { padding: 18px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      * { transition: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wrap header-inner">
+      <span class="brand">CTCI <span>Tests</span></span>
+      <div class="header-actions">
+        <div class="langs" role="group" aria-label="Language / Idioma">
+          <button type="button" class="lang" data-lang="en" aria-pressed="true" aria-label="English" title="English">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <rect width="24" height="24" fill="#b22234"/>
+              <path d="M0 3.7h24M0 7.4h24M0 11.1h24M0 14.8h24M0 18.5h24M0 22.2h24" stroke="#fff" stroke-width="1.85"/>
+              <rect width="11" height="12.9" fill="#3c3b6e"/>
+              <g fill="#fff"><circle cx="2.5" cy="2.5" r=".7"/><circle cx="5.5" cy="2.5" r=".7"/><circle cx="8.5" cy="2.5" r=".7"/><circle cx="4" cy="5" r=".7"/><circle cx="7" cy="5" r=".7"/><circle cx="2.5" cy="7.5" r=".7"/><circle cx="5.5" cy="7.5" r=".7"/><circle cx="8.5" cy="7.5" r=".7"/><circle cx="4" cy="10" r=".7"/><circle cx="7" cy="10" r=".7"/></g>
+            </svg>
+          </button>
+          <button type="button" class="lang" data-lang="pt" aria-pressed="false" aria-label="Português" title="Português">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <rect width="24" height="24" fill="#009c3b"/>
+              <path d="M12 3.5 22 12 12 20.5 2 12z" fill="#ffdf00"/>
+              <circle cx="12" cy="12" r="4.6" fill="#002776"/>
+              <path d="M7.6 10.9c2.9-.4 6.2.3 8.7 2" stroke="#fff" stroke-width=".8" fill="none"/>
+            </svg>
+          </button>
+        </div>
+      <a class="gh" id="repo-icon" href="https://github.com/williamtrindade/cracking-the-coding-interview-tests" target="_blank" rel="noopener noreferrer" aria-label="GitHub">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
+      </a>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <div class="wrap grid">
+      <section class="about">
+        <img class="cover" src="https://covers.openlibrary.org/b/isbn/0984782850-L.jpg" alt="Cracking the Coding Interview, 6th edition — book cover" data-i18n-alt="coverAlt" width="150" height="214" />
+        <div>
+          <span class="eyebrow" data-i18n="eyebrow">Cracking the Coding Interview · 6th ed.</span>
+          <h1 data-i18n="title">189 questions, <em>tests ready.</em></h1>
+          <p class="lead" data-i18n="lead">
+            JUnit 5 tests and Java stubs to practice every question in the book. Read the prompt in the book, implement
+            <code>Solution.java</code> and run the tests. The prompts and solutions are not here.
+          </p>
+          <div class="actions">
+            <a class="btn btn-primary" id="repo-btn" href="https://github.com/williamtrindade/cracking-the-coding-interview-tests" target="_blank" rel="noopener noreferrer" data-i18n="repo">Repository</a>
+            <a class="btn btn-outline" href="https://www.amazon.com/dp/0984782850" target="_blank" rel="noopener noreferrer" data-i18n="buy">Buy the book</a>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel" aria-labelledby="panel-title">
+        <div class="panel-head">
+          <h2 class="panel-title" id="panel-title" data-i18n="progress">My progress</h2>
+          <span class="panel-nums"><strong id="done">0</strong> <span data-i18n="of">of</span> <span id="total">189</span> · <span id="pct">0%</span></span>
+        </div>
+        <div class="bar" role="progressbar" aria-label="Overall progress" data-i18n-aria="overall" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="bar"><span id="bar-fill"></span></div>
+        <ol class="chapters" id="chapters"></ol>
+        <div class="panel-foot">
+          <span data-i18n="hint">Click to check off. Saved only in your browser.</span>
+          <span class="foot-actions">
+            <button type="button" class="share-btn" id="share-progress">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12v7a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+              <span data-i18n="shareProgress">Share</span>
+            </button>
+            <button type="button" class="link-btn" id="reset" data-i18n="reset">Reset</button>
+          </span>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <footer>
+    <div class="wrap">
+      <span data-i18n="footer">Independent project, not affiliated with the author or publisher. <em>Cracking the Coding Interview</em> © Gayle Laakmann McDowell.
+      This repository does not contain the book's text: <a href="https://www.amazon.com/dp/0984782850" target="_blank" rel="noopener noreferrer">buy the book</a>.</span>
+    </div>
+  </footer>
+
+  <div class="toast" id="toast" role="status" aria-live="polite">
+    <span id="toast-text"></span>
+    <button type="button" class="toast-share" id="toast-share" data-i18n="share">Share</button>
+    <button type="button" class="toast-close" id="toast-close" aria-label="Close">✕</button>
+  </div>
+
+  <dialog class="share-dialog" id="share-dialog" aria-labelledby="sd-title">
+    <div class="sd-head">
+      <h2 class="sd-title" id="sd-title" data-i18n="shareTitle">Share your progress</h2>
+      <button type="button" class="sd-close" id="sd-close" aria-label="Close">✕</button>
+    </div>
+    <div class="sd-formats" role="group" aria-label="Format">
+      <button type="button" class="sd-format" data-format="horizontal" aria-pressed="true">
+        <svg width="18" height="12" viewBox="0 0 18 12" aria-hidden="true"><rect x="1" y="1" width="16" height="10" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>
+        <span data-i18n="fmtHorizontal">Horizontal</span>
+      </button>
+      <button type="button" class="sd-format" data-format="story" aria-pressed="false">
+        <svg width="10" height="16" viewBox="0 0 10 16" aria-hidden="true"><rect x="1" y="1" width="8" height="14" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>
+        <span>Story</span>
+      </button>
+    </div>
+    <div class="sd-preview"><img class="sd-img" id="sd-img" alt="" /></div>
+    <div class="sd-social">
+      <span class="sd-label" data-i18n="postOn">Post on</span>
+      <div class="socials">
+        <a class="social social-linkedin" data-net="linkedin" href="#" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" title="LinkedIn">
+          <svg width="20" height="20" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M0 1.146C0 .513.526 0 1.175 0h13.65C15.474 0 16 .513 16 1.146v13.708c0 .633-.526 1.146-1.175 1.146H1.175C.526 16 0 15.487 0 14.854zm4.943 12.248V6.169H2.542v7.225zm-1.2-8.212c.837 0 1.358-.554 1.358-1.248-.015-.709-.52-1.248-1.342-1.248S2.4 3.226 2.4 3.934c0 .694.521 1.248 1.327 1.248zm4.908 8.212V9.359c0-.216.016-.432.08-.586.173-.431.568-.878 1.232-.878.869 0 1.216.662 1.216 1.634v3.865h2.401V9.25c0-2.22-1.184-3.252-2.764-3.252-1.274 0-1.845.7-2.165 1.193v.025h-.016l.016-.025V6.169h-2.4c.03.678 0 7.225 0 7.225z"/></svg>
+        </a>
+        <a class="social social-x" data-net="x" href="#" target="_blank" rel="noopener noreferrer" aria-label="X" title="X">
+          <svg width="20" height="20" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M12.6.75h2.454l-5.36 6.142L16 15.25h-4.937l-3.867-5.07-4.425 5.07H.316l5.733-6.57L0 .75h5.063l3.495 4.633L12.601.75Zm-.86 13.028h1.36L4.323 2.145H2.865z"/></svg>
+        </a>
+        <a class="social social-whatsapp" data-net="whatsapp" href="#" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp" title="WhatsApp">
+          <svg width="20" height="20" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M13.601 2.326A7.85 7.85 0 0 0 7.994 0C3.627 0 .068 3.558.064 7.926c0 1.399.366 2.76 1.057 3.965L0 16l4.204-1.102a7.9 7.9 0 0 0 3.79.965h.004c4.368 0 7.926-3.558 7.93-7.93A7.9 7.9 0 0 0 13.6 2.326zM7.994 14.521a6.6 6.6 0 0 1-3.356-.92l-.24-.144-2.494.654.666-2.433-.156-.251a6.56 6.56 0 0 1-1.007-3.505c0-3.626 2.957-6.584 6.591-6.584a6.56 6.56 0 0 1 4.66 1.931 6.56 6.56 0 0 1 1.928 4.66c-.004 3.639-2.961 6.592-6.592 6.592m3.615-4.934c-.197-.099-1.17-.578-1.353-.646-.182-.065-.315-.099-.445.099-.133.197-.513.646-.627.775-.114.133-.232.148-.43.05-.197-.1-.836-.308-1.592-.985-.59-.525-.985-1.175-1.103-1.372-.114-.198-.011-.304.088-.403.087-.088.197-.232.296-.346.1-.114.133-.198.198-.33.065-.134.034-.248-.015-.347-.05-.099-.445-1.076-.612-1.47-.16-.389-.323-.335-.445-.34-.114-.007-.247-.007-.38-.007a.73.73 0 0 0-.529.247c-.182.198-.691.677-.691 1.654s.71 1.916.81 2.049c.098.133 1.394 2.132 3.383 2.992.47.205.84.326 1.129.418.475.152.904.129 1.246.08.38-.058 1.171-.48 1.338-.943.164-.464.164-.86.114-.943-.049-.084-.182-.133-.38-.232"/></svg>
+        </a>
+        <a class="social social-facebook" data-net="facebook" href="#" target="_blank" rel="noopener noreferrer" aria-label="Facebook" title="Facebook">
+          <svg width="20" height="20" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M16 8.049c0-4.446-3.582-8.05-8-8.05C3.58 0-.002 3.603-.002 8.05c0 4.017 2.926 7.347 6.75 7.951v-5.625h-2.03V8.05H6.75V6.275c0-2.017 1.195-3.131 3.022-3.131.876 0 1.791.157 1.791.157v1.98h-1.009c-.993 0-1.303.621-1.303 1.258v1.51h2.218l-.354 2.326H9.25V16c3.824-.604 6.75-3.934 6.75-7.951"/></svg>
+        </a>
+        <a class="social social-telegram" data-net="telegram" href="#" target="_blank" rel="noopener noreferrer" aria-label="Telegram" title="Telegram">
+          <svg width="20" height="20" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0M8.287 5.906q-1.168.486-4.666 2.01-.567.225-.595.442c-.03.243.275.339.69.47l.175.055c.408.133.958.288 1.243.294q.39.01.868-.32 3.269-2.206 3.374-2.23c.05-.012.12-.026.166.016s.042.12.037.141c-.03.129-1.227 1.241-1.846 1.817-.193.18-.33.307-.358.336a8 8 0 0 1-.188.186c-.38.366-.664.64.015 1.088.327.216.589.393.85.571.284.194.568.387.936.629q.14.092.27.187c.331.236.63.448.997.414.214-.02.435-.22.547-.82.265-1.417.786-4.486.906-5.751a1.4 1.4 0 0 0-.013-.315.34.34 0 0 0-.114-.217.53.53 0 0 0-.31-.093c-.3.005-.763.166-2.984 1.09"/></svg>
+        </a>
+        <a class="social social-instagram" data-net="instagram" href="#" target="_blank" rel="noopener noreferrer" aria-label="Instagram" title="Instagram">
+          <svg width="20" height="20" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 0C5.829 0 5.556.01 4.703.048 3.85.088 3.269.222 2.76.42a3.9 3.9 0 0 0-1.417.923A3.9 3.9 0 0 0 .42 2.76C.222 3.268.087 3.85.048 4.7.01 5.555 0 5.827 0 8.001c0 2.172.01 2.444.048 3.297.04.852.174 1.433.372 1.942.205.526.478.972.923 1.417.444.445.89.719 1.416.923.51.198 1.09.333 1.942.372C5.555 15.99 5.827 16 8 16s2.444-.01 3.298-.048c.851-.04 1.434-.174 1.943-.372a3.9 3.9 0 0 0 1.416-.923c.445-.445.718-.891.923-1.417.197-.509.332-1.09.372-1.942C15.99 10.445 16 10.173 16 8s-.01-2.445-.048-3.299c-.04-.851-.175-1.433-.372-1.941a3.9 3.9 0 0 0-.923-1.417A3.9 3.9 0 0 0 13.24.42c-.51-.198-1.092-.333-1.943-.372C10.443.01 10.172 0 7.998 0zm-.717 1.442h.718c2.136 0 2.389.007 3.232.046.78.035 1.204.166 1.486.275.373.145.64.319.92.599s.453.546.598.92c.11.281.24.705.275 1.485.039.843.047 1.096.047 3.231s-.008 2.389-.047 3.232c-.035.78-.166 1.203-.275 1.485a2.5 2.5 0 0 1-.599.919c-.28.28-.546.453-.92.598-.28.11-.704.24-1.485.276-.843.038-1.096.047-3.232.047s-2.39-.009-3.233-.047c-.78-.036-1.203-.166-1.485-.276a2.5 2.5 0 0 1-.92-.598 2.5 2.5 0 0 1-.6-.92c-.109-.281-.24-.705-.275-1.485-.038-.843-.046-1.096-.046-3.233s.008-2.388.046-3.231c.036-.78.166-1.204.276-1.486.145-.373.319-.64.599-.92s.546-.453.92-.598c.282-.11.705-.24 1.485-.276.738-.034 1.024-.044 2.515-.045zm4.988 1.328a.96.96 0 1 0 0 1.92.96.96 0 0 0 0-1.92m-4.27 1.122a4.109 4.109 0 1 0 0 8.217 4.109 4.109 0 0 0 0-8.217m0 1.441a2.667 2.667 0 1 1 0 5.334 2.667 2.667 0 0 1 0-5.334"/></svg>
+        </a>
+      </div>
+    </div>
+    <div class="sd-actions">
+      <button type="button" class="btn btn-primary" id="sd-native" hidden data-i18n="shareNative">Share…</button>
+      <button type="button" class="btn btn-outline" id="sd-download" data-i18n="download">Download image</button>
+      <button type="button" class="btn btn-outline" id="sd-copy" hidden data-i18n="copyImage">Copy image</button>
+    </div>
+    <p class="sd-note" id="sd-note" aria-live="polite"></p>
+  </dialog>
+
+  <script>
+    (function () {
+      "use strict";
+
+      // [capítulo, nº de questões, tema em inglês, tema em português]
+      var CHAPTERS = [
+        [1, 9, "Arrays and Strings", "Arrays e Strings"],
+        [2, 8, "Linked Lists", "Listas Ligadas"],
+        [3, 6, "Stacks and Queues", "Pilhas e Filas"],
+        [4, 12, "Trees and Graphs", "Árvores e Grafos"],
+        [5, 8, "Bit Manipulation", "Manipulação de Bits"],
+        [6, 10, "Math and Logic Puzzles", "Matemática e Lógica"],
+        [7, 12, "Object-Oriented Design", "Orientação a Objetos"],
+        [8, 14, "Recursion and DP", "Recursão e DP"],
+        [9, 8, "System Design", "Design de Sistemas"],
+        [10, 11, "Sorting and Searching", "Ordenação e Busca"],
+        [11, 6, "Testing", "Testes"],
+        [12, 11, "C and C++", "C e C++"],
+        [13, 8, "Java", "Java"],
+        [14, 7, "Databases", "Bancos de Dados"],
+        [15, 7, "Threads and Locks", "Threads e Locks"],
+        [16, 26, "Moderate", "Moderados"],
+        [17, 26, "Hard", "Difíceis"]
+      ];
+
+      // Textos em português (o HTML já vem em inglês, que é o idioma padrão)
+      var PT = {
+        coverAlt: "Capa do livro Cracking the Coding Interview, 6ª edição",
+        eyebrow: "Cracking the Coding Interview · 6ª ed.",
+        title: "189 questões, <em>testes prontos.</em>",
+        lead: "Testes JUnit 5 e stubs em Java para praticar cada questão do livro. Leia o enunciado no livro, implemente o <code>Solution.java</code> e rode os testes. Os enunciados e as soluções não estão aqui.",
+        repo: "Repositório",
+        buy: "Comprar o livro",
+        progress: "Meu progresso",
+        of: "de",
+        overall: "Progresso geral",
+        hint: "Clique para marcar. Salvo só no seu navegador.",
+        reset: "Resetar",
+        footer: 'Projeto independente, sem afiliação com a autora ou a editora. <em>Cracking the Coding Interview</em> © Gayle Laakmann McDowell. Este repositório não contém o texto do livro: <a href="https://www.amazon.com/dp/0984782850" target="_blank" rel="noopener noreferrer">compre o livro</a>.',
+        question: "Questão",
+        confirmReset: "Desmarcar todas as questões?",
+        htmlLang: "pt-BR",
+        shareProgress: "Compartilhar",
+        fmtHorizontal: "Horizontal",
+        share: "Compartilhar",
+        shareTitle: "Compartilhe seu progresso",
+        shareNative: "Compartilhar…",
+        download: "Baixar imagem",
+        copyImage: "Copiar imagem",
+        copied: "Imagem copiada!",
+        postOn: "Postar em",
+        noteCopied: "Imagem copiada: cole no post (Ctrl+V / ⌘V).",
+        noteDownloaded: "Imagem baixada: anexe ao post.",
+        toastSolved: "Questão {id} resolvida! 🎉",
+        cardSolved: "Resolvi a questão",
+        cardProgress: "questões resolvidas",
+        cardChapter: "Capítulo",
+        cardOf: "de",
+        cardBy: "por William Trindade · williamtrindade.com",
+        textSolved: "Acabei de resolver a questão {id} do Cracking the Coding Interview ✅ {done}/189 até agora. Praticando com testes JUnit prontos:",
+        textProgress: "Já resolvi {done} das 189 questões do Cracking the Coding Interview ({pct}%) ✅ Praticando com testes JUnit prontos:",
+        cardAlt: "Card de progresso para compartilhar"
+      };
+      var EN = {
+        question: "Question", confirmReset: "Uncheck all questions?", htmlLang: "en",
+        copied: "Image copied!",
+        noteCopied: "Image copied: paste it into your post (Ctrl+V / ⌘V).",
+        noteDownloaded: "Image downloaded: attach it to your post.",
+        toastSolved: "Question {id} solved! 🎉",
+        cardSolved: "I solved question",
+        cardProgress: "questions solved",
+        cardChapter: "Chapter",
+        cardOf: "of",
+        cardBy: "by William Trindade · williamtrindade.com",
+        textSolved: "Just solved question {id} of Cracking the Coding Interview ✅ {done}/189 so far. Practicing with ready-made JUnit tests:",
+        textProgress: "I've solved {done} of the 189 questions in Cracking the Coding Interview ({pct}%) ✅ Practicing with ready-made JUnit tests:",
+        cardAlt: "Shareable progress card"
+      };
+      document.querySelectorAll("[data-i18n]").forEach(function (el) { EN[el.dataset.i18n] = el.innerHTML.trim(); });
+      document.querySelectorAll("[data-i18n-alt]").forEach(function (el) { EN[el.dataset.i18nAlt] = el.alt; });
+      document.querySelectorAll("[data-i18n-aria]").forEach(function (el) { EN[el.dataset.i18nAria] = el.getAttribute("aria-label"); });
+
+      var KEY = "ctci_guide_completed_v1"; // mesma chave do site antigo: o progresso salvo continua valendo
+      var LANG_KEY = "ctci_lang";
+      var lang = "en";
+      try { if (localStorage.getItem(LANG_KEY) === "pt") lang = "pt"; } catch (_) {}
+      function t(k, vars) {
+        var str = (lang === "pt" ? PT : EN)[k];
+        if (vars) Object.keys(vars).forEach(function (v) { str = str.split("{" + v + "}").join(vars[v]); });
+        return str;
+      }
+      var TOTAL = CHAPTERS.reduce(function (s, c) { return s + c[1]; }, 0);
+
+      // Em <usuario>.github.io/<repo>/ os links apontam para o fork de quem está usando
+      var m = location.hostname.match(/^([^.]+)\.github\.io$/);
+      var repo = location.pathname.split("/").filter(Boolean)[0];
+      var siteUrl = "https://williamtrindade.github.io/cracking-the-coding-interview-tests/";
+      if (m && repo) {
+        siteUrl = location.origin + "/" + repo + "/";
+        var url = "https://github.com/" + m[1] + "/" + repo;
+        document.getElementById("repo-btn").href = url;
+        document.getElementById("repo-icon").href = url;
+      }
+
+      var done = new Set();
+      try {
+        var saved = JSON.parse(localStorage.getItem(KEY) || "[]");
+        if (Array.isArray(saved)) done = new Set(saved.map(String));
+      } catch (_) {}
+
+      function save() {
+        try { localStorage.setItem(KEY, JSON.stringify(Array.from(done))); } catch (_) {}
+      }
+
+      var list = document.getElementById("chapters");
+      list.innerHTML = CHAPTERS.map(function (c) {
+        var cells = "";
+        for (var i = 1; i <= c[1]; i++) {
+          var id = c[0] + "." + i;
+          cells += '<button type="button" class="cell" data-id="' + id + '" aria-pressed="' + done.has(id) +
+            '" title="' + id + '">' + i + "</button>";
+        }
+        return '<li class="ch" data-ch="' + c[0] + '"><span class="ch-name"><b>' + c[0] + "</b><span></span>" +
+          '</span><span class="cells">' + cells + '</span><span class="ch-count"></span></li>';
+      }).join("");
+
+      function render() {
+        var total = 0;
+        CHAPTERS.forEach(function (c) {
+          var n = 0;
+          for (var i = 1; i <= c[1]; i++) if (done.has(c[0] + "." + i)) n++;
+          total += n;
+          var row = list.querySelector('[data-ch="' + c[0] + '"]');
+          row.querySelector(".ch-count").textContent = n + "/" + c[1];
+          row.classList.toggle("complete", n === c[1]);
+        });
+        var pct = Math.round((total / TOTAL) * 100);
+        document.getElementById("done").textContent = total;
+        document.getElementById("total").textContent = TOTAL;
+        document.getElementById("pct").textContent = pct + "%";
+        document.getElementById("bar-fill").style.width = pct + "%";
+        document.getElementById("bar").setAttribute("aria-valuenow", pct);
+      }
+
+      list.addEventListener("click", function (e) {
+        var btn = e.target.closest(".cell");
+        if (!btn) return;
+        var id = btn.dataset.id;
+        if (done.has(id)) done.delete(id); else done.add(id);
+        btn.setAttribute("aria-pressed", done.has(id));
+        save();
+        render();
+        if (done.has(id)) showToast(id); else hideToast();
+      });
+
+      document.getElementById("reset").addEventListener("click", function () {
+        if (!done.size || !confirm(t("confirmReset"))) return;
+        done.clear();
+        save();
+        list.querySelectorAll(".cell").forEach(function (b) { b.setAttribute("aria-pressed", "false"); });
+        render();
+      });
+
+      /* ---------- Compartilhar: card 1200x630 desenhado em canvas ---------- */
+      var toast = document.getElementById("toast");
+      var toastTimer = null;
+      var toastId = null;
+
+      function showToast(id) {
+        toastId = id;
+        document.getElementById("toast-text").textContent = t("toastSolved", { id: id });
+        toast.classList.add("show");
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(hideToast, 7000);
+      }
+      function hideToast() {
+        toast.classList.remove("show");
+        clearTimeout(toastTimer);
+      }
+      toast.addEventListener("mouseenter", function () { clearTimeout(toastTimer); });
+      toast.addEventListener("mouseleave", function () { toastTimer = setTimeout(hideToast, 3000); });
+      document.getElementById("toast-close").addEventListener("click", hideToast);
+      document.getElementById("toast-share").addEventListener("click", function () { hideToast(); openShare(toastId); });
+      document.getElementById("share-progress").addEventListener("click", function () { openShare(null); });
+
+      function chapterOf(id) {
+        var n = +id.split(".")[0];
+        return CHAPTERS.filter(function (c) { return c[0] === n; })[0];
+      }
+
+      function roundRect(ctx, x, y, w, h, r) {
+        ctx.beginPath();
+        ctx.moveTo(x + r, y);
+        ctx.arcTo(x + w, y, x + w, y + h, r);
+        ctx.arcTo(x + w, y + h, x, y + h, r);
+        ctx.arcTo(x, y + h, x, y, r);
+        ctx.arcTo(x, y, x + w, y, r);
+        ctx.closePath();
+      }
+
+      var CARD = {
+        F: '"Inter", -apple-system, "Segoe UI", Roboto, sans-serif',
+        BLUE: "#0866ff", TEXT: "#1c2b33", MUTED: "#65676b", LINE: "#e2e8f0"
+      };
+
+      // Escreve um texto encolhendo a fonte até caber em maxW
+      function fitText(ctx, text, x, y, maxW, size, weight) {
+        do { ctx.font = weight + " " + size + "px " + CARD.F; size -= 2; } while (size > 8 && ctx.measureText(text).width > maxW);
+        ctx.fillText(text, x, y);
+        return ctx.measureText(text).width;
+      }
+
+      function newCanvas(W, H, S) {
+        var cv = document.createElement("canvas");
+        cv.width = W * S; cv.height = H * S;
+        var ctx = cv.getContext("2d");
+        ctx.scale(S, S);
+        ctx.textBaseline = "alphabetic";
+        // Fundo branco com um brilho azul suave no canto
+        ctx.fillStyle = "#ffffff";
+        ctx.fillRect(0, 0, W, H);
+        var g = ctx.createRadialGradient(W, 0, 0, W, 0, Math.max(W, H) * 0.55);
+        g.addColorStop(0, "rgba(8,102,255,0.10)");
+        g.addColorStop(1, "rgba(8,102,255,0)");
+        ctx.fillStyle = g;
+        ctx.fillRect(0, 0, W, H);
+        return { cv: cv, ctx: ctx };
+      }
+
+      function drawBrand(ctx, x, y, size) {
+        ctx.font = "700 " + size + "px " + CARD.F;
+        ctx.fillStyle = CARD.TEXT;
+        ctx.fillText("CTCI", x, y);
+        ctx.fillStyle = CARD.BLUE;
+        ctx.fillText("Tests", x + ctx.measureText("CTCI ").width, y);
+      }
+
+      function drawEyebrow(ctx, x, y, size, spacing) {
+        ctx.font = "700 " + size + "px " + CARD.F;
+        ctx.fillStyle = CARD.BLUE;
+        if (ctx.letterSpacing !== undefined) ctx.letterSpacing = spacing + "px";
+        ctx.fillText(lang === "pt" ? "CRACKING THE CODING INTERVIEW · 6ª ED." : "CRACKING THE CODING INTERVIEW · 6TH ED.", x, y);
+        if (ctx.letterSpacing !== undefined) ctx.letterSpacing = "0px";
+      }
+
+      // Destaque: "Resolvi a questão 4.2" ou "21 / 189 questões resolvidas". k = escala, maxW = largura útil
+      function drawHeadline(ctx, id, x, y, k, maxW) {
+        var total = done.size;
+        if (id) {
+          var ch = chapterOf(id);
+          ctx.fillStyle = CARD.MUTED;
+          fitText(ctx, t("cardSolved"), x, y, maxW, 34 * k, 600);
+          ctx.fillStyle = CARD.BLUE;
+          fitText(ctx, id, x - 6 * k, y + 134 * k, maxW, 150 * k, 800);
+          ctx.fillStyle = CARD.MUTED;
+          fitText(ctx, t("cardChapter") + " " + ch[0] + " · " + (lang === "pt" ? ch[3] : ch[2]), x, y + 180 * k, maxW, 24 * k, 500);
+        } else {
+          ctx.fillStyle = CARD.BLUE;
+          var nw = fitText(ctx, String(total), x - 6 * k, y + 94 * k, maxW, 150 * k, 800);
+          ctx.font = "700 " + 44 * k + "px " + CARD.F;
+          ctx.fillStyle = CARD.TEXT;
+          ctx.fillText("/ " + TOTAL, x + nw + 8 * k, y + 94 * k);
+          ctx.font = "600 " + 30 * k + "px " + CARD.F;
+          ctx.fillStyle = CARD.MUTED;
+          ctx.fillText(t("cardProgress"), x, y + 148 * k);
+        }
+      }
+
+      function drawBar(ctx, x, y, w, h, textSize) {
+        var total = done.size, pct = Math.round((total / TOTAL) * 100);
+        roundRect(ctx, x, y, w, h, h / 2); ctx.fillStyle = CARD.LINE; ctx.fill();
+        if (total) { roundRect(ctx, x, y, Math.max(h, w * total / TOTAL), h, h / 2); ctx.fillStyle = CARD.BLUE; ctx.fill(); }
+        ctx.font = "600 " + textSize + "px " + CARD.F;
+        ctx.fillStyle = CARD.TEXT;
+        ctx.fillText(total + " " + t("cardOf") + " " + TOTAL + " · " + Math.round((total / TOTAL) * 100) + "%", x, y + h + textSize * 1.7);
+      }
+
+      // Mapa das 189 questões (uma linha por capítulo) dentro de um painel claro
+      function drawMap(ctx, id, px, py, pw, cell, gap, rowH, labelSize) {
+        var pad = cell * 1.8, labelW = labelSize * 1.6;
+        var padX = (pw - (labelW + 26 * (cell + gap) - gap)) / 2; // centraliza a linha mais longa (26 questões)
+        roundRect(ctx, px, py, pw, 17 * rowH - (rowH - cell) + 2 * pad, cell * 1.5);
+        ctx.fillStyle = "#f8f9fa"; ctx.fill();
+        ctx.font = "600 " + labelSize + "px " + CARD.F;
+        CHAPTERS.forEach(function (c, r) {
+          var y = py + pad + r * rowH;
+          ctx.fillStyle = CARD.MUTED;
+          ctx.textAlign = "right";
+          ctx.fillText(String(c[0]), px + padX + labelW - labelSize * 0.6, y + cell / 2 + labelSize * 0.36);
+          ctx.textAlign = "left";
+          for (var i = 1; i <= c[1]; i++) {
+            var qid = c[0] + "." + i, x = px + padX + labelW + (i - 1) * (cell + gap);
+            roundRect(ctx, x, y, cell, cell, cell / 4);
+            if (done.has(qid)) { ctx.fillStyle = CARD.BLUE; ctx.fill(); }
+            else { ctx.fillStyle = "#ffffff"; ctx.fill(); ctx.strokeStyle = CARD.LINE; ctx.lineWidth = 1; ctx.stroke(); }
+            if (qid === id) {
+              roundRect(ctx, x - cell / 5, y - cell / 5, cell * 1.4, cell * 1.4, cell / 2.5);
+              ctx.strokeStyle = "#0f172a"; ctx.lineWidth = Math.max(2, cell / 8); ctx.stroke();
+            }
+          }
+        });
+      }
+
+      function shortUrl() { return siteUrl.replace(/^https?:\/\//, "").replace(/\/$/, ""); }
+
+      // Horizontal 1200x630 (LinkedIn, X, feed)
+      function drawHorizontal(id) {
+        var W = 1200, H = 630, L = 72;
+        var c = newCanvas(W, H, 2), ctx = c.ctx;
+        drawBrand(ctx, L, 92, 26);
+        drawEyebrow(ctx, L, 180, 16, 2);
+        drawHeadline(ctx, id, L, 236, 1, 500);
+        drawBar(ctx, L, 466, 440, 12, 20);
+        drawMap(ctx, id, 612, 84, W - 44 - 612, 15, 3, 22, 12);
+        ctx.fillStyle = CARD.LINE;
+        ctx.fillRect(L, H - 86, W - 2 * L, 1);
+        ctx.font = "600 18px " + CARD.F;
+        ctx.fillStyle = CARD.TEXT;
+        ctx.fillText(t("cardBy"), L, H - 46);
+        ctx.font = "500 18px " + CARD.F;
+        ctx.fillStyle = CARD.MUTED;
+        ctx.textAlign = "right";
+        ctx.fillText(shortUrl(), W - L, H - 46);
+        ctx.textAlign = "left";
+        return c.cv;
+      }
+
+      // Story 1080x1920 (Instagram, WhatsApp, LinkedIn stories).
+      // O conteúdo fica entre y=270 e y=1690: o topo e o rodapé são cobertos pela interface dos apps.
+      function drawStory(id) {
+        var W = 1080, H = 1920, L = 96, CW = W - 2 * L;
+        var c = newCanvas(W, H, 1), ctx = c.ctx;
+        drawBrand(ctx, L, 310, 48);
+        drawEyebrow(ctx, L, 420, 26, 3);
+        drawHeadline(ctx, id, L, 490, 1.8, CW);
+        drawBar(ctx, L, 860, CW, 20, 34);
+        drawMap(ctx, id, L, 990, CW, 23, 4, 30, 17);
+        ctx.fillStyle = CARD.LINE;
+        ctx.fillRect(L, 1590, CW, 2);
+        ctx.fillStyle = CARD.TEXT;
+        fitText(ctx, t("cardBy"), L, 1648, CW, 34, 600);
+        ctx.fillStyle = CARD.MUTED;
+        fitText(ctx, shortUrl(), L, 1694, CW, 28, 500);
+        return c.cv;
+      }
+
+      var dialog = document.getElementById("share-dialog");
+      var shareBlob = null;
+      var shareText = "";
+      var shareId = null;
+      var FORMAT_KEY = "ctci_share_format";
+      var shareFormat = "horizontal";
+      try { if (localStorage.getItem(FORMAT_KEY) === "story") shareFormat = "story"; } catch (_) {}
+
+      function renderShare() {
+        var cv = shareFormat === "story" ? drawStory(shareId) : drawHorizontal(shareId);
+        var img = document.getElementById("sd-img");
+        img.src = cv.toDataURL("image/png");
+        img.alt = t("cardAlt");
+        img.classList.toggle("story", shareFormat === "story");
+        document.querySelectorAll(".sd-format").forEach(function (b) { b.setAttribute("aria-pressed", b.dataset.format === shareFormat); });
+        shareBlob = null;
+        cv.toBlob(function (b) { shareBlob = b; updateShareButtons(); }, "image/png");
+      }
+
+      document.querySelectorAll(".sd-format").forEach(function (b) {
+        b.addEventListener("click", function () {
+          shareFormat = b.dataset.format;
+          try { localStorage.setItem(FORMAT_KEY, shareFormat); } catch (_) {}
+          renderShare();
+        });
+      });
+
+      function openShare(id) {
+        shareId = id;
+        var fonts = document.fonts ? Promise.all([
+          document.fonts.load('800 150px "Inter"'), document.fonts.load('700 26px "Inter"'),
+          document.fonts.load('600 20px "Inter"'), document.fonts.load('500 18px "Inter"')
+        ]).catch(function () {}) : Promise.resolve();
+        fonts.then(function () {
+          renderShare();
+          var pct = Math.round((done.size / TOTAL) * 100);
+          shareText = id ? t("textSolved", { id: id, done: done.size }) : t("textProgress", { done: done.size, pct: pct });
+          setNote("", false);
+          var u = encodeURIComponent(siteUrl), txt = encodeURIComponent(shareText), full = encodeURIComponent(shareText + " " + siteUrl);
+          var hrefs = {
+            linkedin: "https://www.linkedin.com/feed/?shareActive=true&text=" + full,
+            x: "https://x.com/intent/tweet?text=" + txt + "&url=" + u,
+            whatsapp: "https://wa.me/?text=" + full,
+            facebook: "https://www.facebook.com/sharer/sharer.php?u=" + u,
+            telegram: "https://t.me/share/url?url=" + u + "&text=" + txt,
+            instagram: "https://www.instagram.com/"
+          };
+          document.querySelectorAll(".social").forEach(function (a) { a.href = hrefs[a.dataset.net]; });
+          if (dialog.showModal) dialog.showModal(); else dialog.setAttribute("open", "");
+        });
+      }
+
+      function fileName() { return "ctci-progress-" + shareFormat + ".png"; }
+      function shareFile() { return new File([shareBlob], fileName(), { type: "image/png" }); }
+
+      function updateShareButtons() {
+        document.getElementById("sd-native").hidden = !canNativeShare();
+        document.getElementById("sd-copy").hidden = !canCopy();
+      }
+
+      document.getElementById("sd-close").addEventListener("click", function () { dialog.close(); });
+      dialog.addEventListener("click", function (e) { if (e.target === dialog) dialog.close(); });
+
+      function setNote(msg, ok) {
+        var n = document.getElementById("sd-note");
+        n.textContent = msg;
+        n.classList.toggle("ok", !!ok);
+      }
+
+      function downloadImage() {
+        var a = document.createElement("a");
+        a.href = document.getElementById("sd-img").src;
+        a.download = fileName();
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+      }
+
+      function canCopy() { return !!(window.ClipboardItem && navigator.clipboard && navigator.clipboard.write); }
+      function canNativeShare() {
+        try { return !!(navigator.canShare && shareBlob && navigator.canShare({ files: [shareFile()] })); } catch (_) { return false; }
+      }
+
+      // As redes não aceitam imagem por link: antes de abrir, copia a imagem (ou baixa) para colar no post
+      function prepareImage() {
+        if (canCopy() && shareBlob) {
+          navigator.clipboard.write([new ClipboardItem({ "image/png": shareBlob })])
+            .then(function () { setNote(t("noteCopied"), true); })
+            .catch(function () { downloadImage(); setNote(t("noteDownloaded"), true); });
+        } else {
+          downloadImage();
+          setNote(t("noteDownloaded"), true);
+        }
+      }
+
+      document.querySelectorAll(".social").forEach(function (a) {
+        a.addEventListener("click", function (e) {
+          // Instagram não tem link de compartilhamento: no celular usa o menu de compartilhar do sistema
+          if (a.dataset.net === "instagram" && canNativeShare()) {
+            e.preventDefault();
+            navigator.share({ files: [shareFile()] }).catch(function () {});
+            return;
+          }
+          prepareImage();
+        });
+      });
+
+      document.getElementById("sd-download").addEventListener("click", downloadImage);
+
+      document.getElementById("sd-native").addEventListener("click", function () {
+        if (!shareBlob) return;
+        navigator.share({ files: [shareFile()], text: shareText + " " + siteUrl }).catch(function () {});
+      });
+
+      document.getElementById("sd-copy").addEventListener("click", function () {
+        if (!shareBlob) return;
+        var btn = this;
+        navigator.clipboard.write([new ClipboardItem({ "image/png": shareBlob })]).then(function () {
+          var old = btn.textContent;
+          btn.textContent = t("copied");
+          setTimeout(function () { btn.textContent = old; }, 1800);
+        }).catch(function () {});
+      });
+
+      function applyLang() {
+        document.documentElement.lang = t("htmlLang");
+        document.querySelectorAll("[data-i18n]").forEach(function (el) { el.innerHTML = t(el.dataset.i18n); });
+        document.querySelectorAll("[data-i18n-alt]").forEach(function (el) { el.alt = t(el.dataset.i18nAlt); });
+        document.querySelectorAll("[data-i18n-aria]").forEach(function (el) { el.setAttribute("aria-label", t(el.dataset.i18nAria)); });
+        document.querySelectorAll(".lang").forEach(function (b) { b.setAttribute("aria-pressed", b.dataset.lang === lang); });
+        CHAPTERS.forEach(function (c) {
+          list.querySelector('[data-ch="' + c[0] + '"] .ch-name span').textContent = lang === "pt" ? c[3] : c[2];
+        });
+        list.querySelectorAll(".cell").forEach(function (b) { b.setAttribute("aria-label", t("question") + " " + b.dataset.id); });
+      }
+
+      document.querySelectorAll(".lang").forEach(function (b) {
+        b.addEventListener("click", function () {
+          lang = b.dataset.lang;
+          try { localStorage.setItem(LANG_KEY, lang); } catch (_) {}
+          applyLang();
+        });
+      });
+
+      applyLang();
+      render();
+    })();
+  </script>
+</body>
+</html>
