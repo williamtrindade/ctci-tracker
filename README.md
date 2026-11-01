@@ -5,7 +5,7 @@ Automated tests (JUnit 5) and Java stubs to practice the **189 questions** of
 
 > ⚠️ **This repository does not contain the book's text.** The prompts and solutions are in the book; here you only
 > get each question's reference, the expected signature and the tests. Buy the book:
-> [Amazon.com](https://www.amazon.com/dp/0984782850) · [Amazon Brasil](https://www.amazon.com.br/dp/0984782850).
+> [Amazon.com](https://www.amazon.com/dp/0984782850) · [Amazon Brasil (pt-BR)](https://link.amazon/B05KGCA0u).
 
 ## How to use
 

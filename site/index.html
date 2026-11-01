@@ -308,7 +308,7 @@
           </p>
           <div class="actions">
             <a class="btn btn-primary" id="repo-btn" href="https://github.com/williamtrindade/cracking-the-coding-interview-tests" target="_blank" rel="noopener noreferrer" data-i18n="repo">Repository</a>
-            <a class="btn btn-outline" href="https://www.amazon.com/dp/0984782850" target="_blank" rel="noopener noreferrer" data-i18n="buy">Buy the book</a>
+            <a class="btn btn-outline" id="buy-btn" href="https://www.amazon.com/dp/0984782850" target="_blank" rel="noopener noreferrer" data-i18n="buy">Buy the book</a>
           </div>
         </div>
       </section>
@@ -432,10 +432,11 @@
         overall: "Progresso geral",
         hint: "Clique para marcar. Salvo só no seu navegador.",
         reset: "Resetar",
-        footer: 'Projeto independente, sem afiliação com a autora ou a editora. <em>Cracking the Coding Interview</em> © Gayle Laakmann McDowell. Este repositório não contém o texto do livro: <a href="https://www.amazon.com/dp/0984782850" target="_blank" rel="noopener noreferrer">compre o livro</a>.',
+        footer: 'Projeto independente, sem afiliação com a autora ou a editora. <em>Cracking the Coding Interview</em> © Gayle Laakmann McDowell. Este repositório não contém o texto do livro: <a href="https://link.amazon/B05KGCA0u" target="_blank" rel="noopener noreferrer">compre o livro</a>.',
         question: "Questão",
         confirmReset: "Desmarcar todas as questões?",
         htmlLang: "pt-BR",
+        buyUrl: "https://link.amazon/B05KGCA0u",
         shareProgress: "Compartilhar",
         fmtHorizontal: "Horizontal",
         share: "Compartilhar",
@@ -459,6 +460,7 @@
       };
       var EN = {
         question: "Question", confirmReset: "Uncheck all questions?", htmlLang: "en",
+        buyUrl: "https://www.amazon.com/dp/0984782850",
         copied: "Image copied!",
         noteCopied: "Image copied: paste it into your post (Ctrl+V / ⌘V).",
         noteDownloaded: "Image downloaded: attach it to your post.",
@@ -866,6 +868,7 @@
 
       function applyLang() {
         document.documentElement.lang = t("htmlLang");
+        document.getElementById("buy-btn").href = t("buyUrl");
         document.querySelectorAll("[data-i18n]").forEach(function (el) { el.innerHTML = t(el.dataset.i18n); });
         document.querySelectorAll("[data-i18n-alt]").forEach(function (el) { el.alt = t(el.dataset.i18nAlt); });
         document.querySelectorAll("[data-i18n-aria]").forEach(function (el) { el.setAttribute("aria-label", t(el.dataset.i18nAria)); });
